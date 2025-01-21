@@ -75,11 +75,6 @@
                         <i data-lucide="search" class="w-5 h-5 text-white/40"></i>
                     </button>
                 </form>
-
-                <button class="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all relative">
-                    <i data-lucide="bell" class="w-5 h-5"></i>
-                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
             </div>
         </div>
 

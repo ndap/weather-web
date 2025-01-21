@@ -136,10 +136,10 @@ class LocationController extends Controller
 
         try {
             $location->delete();
-            return redirect()->route('locations.index')  // Changed from redirect()->back()
+            return redirect()->route('locations.index')
                 ->with('success', 'Location removed successfully!');
         } catch (\Exception $e) {
-            return redirect()->route('locations.index')  // Changed from redirect()->back()
+            return redirect()->route('locations.index')
                 ->with('error', 'An error occurred while removing the location. Please try again.');
         }
     }
