@@ -28,24 +28,31 @@ class LocationController extends Controller
         return view('locations.index', compact('savedLocations'));
     }
     public function store(Request $request)
-    {
-        $request->validate([
-            'location' => 'required|string|max:255',
+{
+    $request->validate([
+        'location' => 'required|string|max:255',
+    ]);
+
+    try {
+        // Mendapatkan koordinat dari nama lokasi
+        $geocodingUrl = "http://api.openweathermap.org/geo/1.0/direct";
+        $response = Http::get($geocodingUrl, [
+            'q' => $request->location,
+            'limit' => 1,
+            'appid' => $this->apiKey
         ]);
 
-        try {
-            // dapetin kordinat dari kota yg iinput
-            $geocodingUrl = "http://api.openweathermap.org/geo/1.0/direct";
-            $response = Http::get($geocodingUrl, [
-                'q' => $request->location,
-                'limit' => 1,
-                'appid' => $this->apiKey
-            ]);
+        // Log seluruh respons untuk debugging lebih lanjut
+        \Log::debug('Respons API Geocoding', ['response' => $response->json(), 'status' => $response->status()]);
 
-            if ($response->successful() && count($response->json()) > 0) {
-                $locationData = $response->json()[0];
+        if ($response->successful()) {
+            // Memeriksa apakah respons memiliki lokasi yang valid
+            $locationData = $response->json();
 
-                // Check if location already exists for user
+            if (count($locationData) > 0) {
+                $locationData = $locationData[0];  // Menggunakan hasil pertama
+
+                // Memeriksa apakah lokasi sudah ada untuk pengguna
                 $existingLocation = Location::where('user_id', Auth::id())
                     ->where('latitude', $locationData['lat'])
                     ->where('longitude', $locationData['lon'])
@@ -53,10 +60,10 @@ class LocationController extends Controller
 
                 if ($existingLocation) {
                     return redirect()->back()
-                        ->with('error', 'This location is already in your saved locations.');
+                        ->with('error', 'Lokasi ini sudah ada dalam lokasi yang disimpan.');
                 }
 
-                // buat lokasibaru
+                // Membuat data lokasi baru
                 Location::create([
                     'user_id' => Auth::id(),
                     'city' => $locationData['name'],
@@ -66,16 +73,33 @@ class LocationController extends Controller
                 ]);
 
                 return redirect()->back()
-                    ->with('success', 'Location added successfully!');
+                    ->with('success', 'Lokasi berhasil ditambahkan!');
             }
 
+            // Jika tidak ditemukan lokasi
             return redirect()->back()
-                ->with('error', 'Location not found. Please try again.');
-        } catch (\Exception $e) {
+                ->with('error', 'Lokasi tidak ditemukan. Silakan periksa nama dan coba lagi.');
+
+        } else {
+            // Log status respons dan pesan error
+            \Log::error('Geocoding API gagal', [
+                'status' => $response->status(),
+                'response_body' => $response->body()
+            ]);
+
             return redirect()->back()
-                ->with('error', 'An error occurred while adding the location. Please try again.');
+                ->with('error', 'Gagal menghubungi layanan geocoding. Silakan coba lagi nanti.');
         }
+    } catch (\Exception $e) {
+        // Log error yang tidak terduga
+        \Log::error('Terjadi kesalahan saat menambahkan lokasi', ['exception' => $e]);
+
+        return redirect()->back()
+            ->with('error', 'Terjadi kesalahan saat menambahkan lokasi. Silakan coba lagi.');
     }
+}
+
+
 
     /**
      * Update the specified location in storage.

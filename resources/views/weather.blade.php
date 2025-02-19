@@ -125,7 +125,22 @@
             </button>
         </div>
         <!-- Add your sidebar content here -->
-
+        <nav class="space-y-4">
+            <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 transition-all hover:bg-white/20">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ route('locations.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all">
+                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                <span>Locations</span>
+            </a>
+            <div class="pt-4 mt-4 border-t border-white/10">
+                <a href="{{ route('logout') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-red-400">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </nav>
     </div>
 
     <!-- Main Content -->
