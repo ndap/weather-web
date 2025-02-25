@@ -44,3 +44,9 @@ Clone repositori ini ke dalam direktori lokal Anda:
 ```bash
 git clone https://github.com/username/weather-web.git
 cd weather-web
+
+### 2. Instal Dependensi Backend
+Install dependensi PHP menggunakan Composer:
+
+```bash
+composer install
